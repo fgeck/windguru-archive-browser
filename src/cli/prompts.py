@@ -9,6 +9,7 @@ from ..models.spot import Spot
 from ..models.weather import DateRange, WeatherModel
 from ..utils.date_utils import parse_date_range_input
 from ..config.constants import WEATHER_MODELS
+from ..services.credential_storage import CredentialStorage
 from .formatter import CLIFormatter
 
 
@@ -24,31 +25,63 @@ class CredentialsPrompt:
             Tuple of (email, password, manual_credentials, method)
             - If method='auto': email and password will be set
             - If method='manual': manual_credentials will be set
+            - If method='cached': manual_credentials will be set from cache
         """
         fmt = CLIFormatter()
 
         print(fmt.header("WINDGURU CREDENTIALS"))
+
+        # Check for saved credentials
+        saved_creds = CredentialStorage.get_credentials()
+        saved_username = CredentialStorage.get_username()
+
+        if saved_creds:
+            print(fmt.success("Found saved credentials!"))
+            if saved_username:
+                print(f"   Username: {saved_username}")
+            print(f"   IDU: {saved_creds.idu}")
+            print()
+            use_saved = input("Use saved credentials? (Y/n): ").strip().lower()
+            if use_saved != 'n':
+                return None, None, saved_creds, 'cached'
+            print()
+
         print("Choose login method:")
         print("  1. Auto-login (recommended) - Enter your Windguru username/password")
         print("  2. Manual - Enter idu and login_md5 from browser cookies")
+        if saved_creds:
+            print("  3. Clear saved credentials and exit")
         print()
 
         while True:
-            choice = input("Choose method (1 or 2): ").strip()
+            max_choice = 3 if saved_creds else 2
+            choice = input(f"Choose method (1-{max_choice}): ").strip()
 
             if choice == '1':
                 print(fmt.subheader("AUTO LOGIN"))
                 print("Your password will not be displayed as you type (hidden input)")
                 print()
 
-                email = input("Windguru email: ").strip()
+                # Pre-fill username if available
+                default_email = saved_username or ""
+                if default_email:
+                    email = input(f"Windguru email [{default_email}]: ").strip() or default_email
+                else:
+                    email = input("Windguru email: ").strip()
+
                 password = getpass.getpass("Windguru password: ")
 
                 if not email or not password:
                     print(fmt.error("Both email and password are required!"))
                     continue
 
-                return email, password, None, 'auto'
+                # Ask if they want to save credentials
+                print()
+                save_creds = input("Save credentials for next time? (Y/n): ").strip().lower()
+                if save_creds != 'n':
+                    return email, password, None, 'auto-save'
+                else:
+                    return email, password, None, 'auto'
 
             elif choice == '2':
                 print(fmt.subheader("MANUAL METHOD - Extract cookies from browser"))
@@ -77,10 +110,22 @@ class CredentialsPrompt:
                 print(f"   IDU: {idu}")
                 print(f"   login_md5: {login_md5[:20]}...")
 
-                return None, None, credentials, 'manual'
+                # Ask if they want to save credentials
+                print()
+                save_creds = input("Save credentials for next time? (Y/n): ").strip().lower()
+                if save_creds != 'n':
+                    return None, None, credentials, 'manual-save'
+                else:
+                    return None, None, credentials, 'manual'
+
+            elif choice == '3' and saved_creds:
+                CredentialStorage.clear_credentials()
+                print(fmt.success("Saved credentials cleared!"))
+                import sys
+                sys.exit(0)
 
             else:
-                print(fmt.error("Please enter 1 or 2"))
+                print(fmt.error(f"Please enter a number between 1 and {max_choice}"))
 
 
 class SpotPrompt:

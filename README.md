@@ -51,6 +51,9 @@ docker run -it -v $(pwd)/output:/app/output windguru-archive-browser
 When you run the tool, you'll be guided through 5 steps:
 
 1. **Login** - Enter your Windguru email and password (or use manual cookies)
+   - Credentials are **securely cached** in your system keyring for convenience
+   - On subsequent runs, just press Enter to use saved credentials
+   - Clear credentials anytime with option 3
 2. **Search** - Find your spot by name (e.g., "Theologos", "Tarifa")
 3. **Select Model** - Choose weather model (GFS, ICON, etc.) or use default
 4. **Date Range** - Enter dates like `2024-05` or `2024-05-15`
@@ -100,6 +103,17 @@ An interactive HTML dashboard is generated with two panels:
 - **Temperature** - Timeline showing temperature trends
 
 The file is saved to `output/` directory with a timestamp and automatically opens in your browser.
+
+## Security
+
+### Credential Storage
+
+Credentials are stored securely using your system's native credential manager:
+- **macOS**: Keychain
+- **Windows**: Windows Credential Locker
+- **Linux**: Secret Service (requires libsecret)
+
+Passwords are never stored - only authentication tokens (idu and login_md5) are cached.
 
 ## Requirements
 

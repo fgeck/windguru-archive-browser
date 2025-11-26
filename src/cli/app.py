@@ -14,6 +14,7 @@ from ..services.auth_service import AuthService
 from ..services.spot_service import SpotService
 from ..services.archive_service import ArchiveService
 from ..services.visualization_service import VisualizationService
+from ..services.credential_storage import CredentialStorage
 from ..config.settings import Settings
 from ..utils.stats_utils import print_weather_stats
 from .prompts import CredentialsPrompt, SpotPrompt, DateRangePrompt, ModelPrompt
@@ -55,7 +56,7 @@ class WindguruCLI:
         """
         email, password, manual_creds, method = CredentialsPrompt.prompt()
 
-        if method == 'auto':
+        if method in ('auto', 'auto-save'):
             # Auto-login
             self.auth_service = AuthService()
             print(f"\n{self.fmt.working('Connecting to Windguru...')}")
@@ -74,10 +75,26 @@ class WindguruCLI:
             print(f"   IDU: {self.credentials.idu}")
             print(f"   login_md5: {self.credentials.login_md5[:20]}...")
 
-        else:
+            # Save credentials if requested
+            if method == 'auto-save':
+                CredentialStorage.save_credentials(self.credentials, username=email)
+                print(self.fmt.success("Credentials saved securely!"))
+
+        elif method in ('manual', 'manual-save'):
             # Manual login
             self.credentials = manual_creds
             self.auth_service = AuthService()
+
+            # Save credentials if requested
+            if method == 'manual-save':
+                CredentialStorage.save_credentials(self.credentials)
+                print(self.fmt.success("Credentials saved securely!"))
+
+        elif method == 'cached':
+            # Use cached credentials
+            self.credentials = manual_creds
+            self.auth_service = AuthService()
+            print(self.fmt.success("Using saved credentials!"))
 
         # Initialize services
         self.spot_service = SpotService(self.credentials)
