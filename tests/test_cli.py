@@ -183,7 +183,7 @@ class TestWindguruCLI:
 
     @patch('src.cli.app.SpotPrompt.prompt_search')
     @patch('src.cli.app.SpotPrompt.display_results')
-    def test_select_spot_success(self, mock_display, mock_search, mocker):
+    def test_select_spot_success(self, mock_display, mock_search):
         """Test successful spot selection."""
         from src.models.spot import Spot, SpotSearchResult
 

@@ -113,7 +113,11 @@ Credentials are stored securely using your system's native credential manager:
 - **Windows**: Windows Credential Locker
 - **Linux**: Secret Service (requires libsecret)
 
-Passwords are never stored - only authentication tokens (idu and login_md5) are cached.
+**How it works:**
+- Only authentication tokens (idu and login_md5) are cached, never passwords
+- Cached credentials are validated before each use
+- Expired credentials are automatically cleared and you're prompted to log in again
+- You can manually clear credentials anytime with option 3
 
 ## Requirements
 

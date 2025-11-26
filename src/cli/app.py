@@ -81,9 +81,17 @@ class WindguruCLI:
                 print(self.fmt.success("Credentials saved securely!"))
 
         elif method in ('manual', 'manual-save'):
-            # Manual login
+            # Manual login - validate credentials first
             self.credentials = manual_creds
             self.auth_service = AuthService()
+
+            print(f"\n{self.fmt.working('Validating credentials...')}")
+            if not self.auth_service.validate_credentials(self.credentials):
+                print(self.fmt.error("Invalid credentials!"))
+                print("Please check your idu and login_md5 values.")
+                return False
+
+            print(self.fmt.success("Credentials are valid!"))
 
             # Save credentials if requested
             if method == 'manual-save':
@@ -91,10 +99,21 @@ class WindguruCLI:
                 print(self.fmt.success("Credentials saved securely!"))
 
         elif method == 'cached':
-            # Use cached credentials
+            # Use cached credentials - need to validate they're still valid
             self.credentials = manual_creds
             self.auth_service = AuthService()
             print(self.fmt.success("Using saved credentials!"))
+            print(f"\n{self.fmt.working('Validating credentials...')}")
+
+            # Validate credentials by attempting to establish session
+            if not self.auth_service.validate_credentials(self.credentials):
+                print(self.fmt.error("Saved credentials are no longer valid!"))
+                print("Clearing expired credentials...")
+                CredentialStorage.clear_credentials()
+                print("\nPlease log in again.")
+                return False
+
+            print(self.fmt.success("Credentials are valid!"))
 
         # Initialize services
         self.spot_service = SpotService(self.credentials)
