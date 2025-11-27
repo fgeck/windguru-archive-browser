@@ -14,6 +14,14 @@ This tool allows you to:
 
 Perfect for kitesurfers, windsurfers, and anyone analyzing wind patterns.
 
+### Two Interfaces Available
+
+- **TUI (Terminal UI)**: Modern, interactive terminal interface with Textual (default)
+  - Visual spot selection with keyboard navigation (↑↓ arrows, Space to select)
+  - Multi-select support for comparing spots
+  - Real-time validation and progress feedback
+- **CLI**: Classic command-line interface for scripts and automation
+
 ## Installation & Usage
 
 ### Local Setup
@@ -30,7 +38,9 @@ git clone https://github.com/fgeck/windguru-archive-browser.git
 cd windguru-archive-browser
 
 # Run the tool (uv handles everything)
-uv run python windguru.py
+uv run python windguru.py           # Modern TUI interface (default)
+# or
+uv run python windguru.py --cli     # Classic CLI interface
 ```
 
 ### Docker Setup
@@ -48,18 +58,31 @@ docker run -it -v $(pwd)/output:/app/output windguru-archive-browser
 
 ## How It Works
 
-When you run the tool, you'll be guided through 5 steps:
+### TUI Workflow (Default)
 
-1. **Login** - Enter your Windguru email and password (or use manual cookies)
-   - Credentials are **securely cached** in your system keyring for convenience
-   - On subsequent runs, just press Enter to use saved credentials
-   - Clear credentials anytime with option 3
-2. **Search** - Find your spot by name (e.g., "Theologos", "Tarifa")
-3. **Select Model** - Choose weather model (GFS, ICON, etc.) or use default
-4. **Date Range** - Enter dates like `2024-05` or `2024-05-15`
-5. **Visualizations** - Get interactive HTML charts automatically opened in your browser
+When you run the tool with TUI (default), you'll see modern interactive screens:
 
-### Example Session
+1. **Login Screen** - Visual form for Windguru credentials
+   - Credentials are **securely cached** in your system keyring
+   - On subsequent runs, click "Use Saved Credentials" button
+   - Option to clear saved credentials if needed
+
+2. **Spot Search Screen** - Interactive spot finder
+   - Type spot name and press Search button
+   - Navigate results with ↑↓ arrow keys
+   - Press Space to select multiple spots
+   - Press Enter to proceed with selected spots
+
+3. **Data Fetch Screen** - Configure your data request
+   - Select weather model from dropdown (default: GFS 13 km)
+   - Enter date range (e.g., `2024-05` or `2024-05-15`)
+   - Click "Fetch & Visualize" button
+   - View real-time progress in log output
+   - Dashboard automatically opens in browser
+
+### CLI Workflow
+
+For the classic CLI interface (`--cli` flag), you'll be prompted step-by-step:
 
 ```
 🌊 WINDGURU DATA ANALYZER 🌊
@@ -75,22 +98,15 @@ Password: ********
 ✅ Successfully logged in!
 
 Search for a spot: Tarifa
+✅ Found 8 spots - select one
 
-✅ Found 8 spots:
-  1. Spain - Tarifa (ID: 123)
-  ...
-
-Choose a spot: 1
-
-Choose model (press Enter for default): [Enter]
-✅ Using: GFS 13 km
+Choose model (press Enter for default GFS 13 km): [Enter]
 
 From (e.g., 2024-05): 2024-07
 To (e.g., 2024-08): 2024-07
 
 ⏳ Fetching data...
 ✅ Fetched 744 data points!
-
 📊 Creating visualizations...
 ✅ SUCCESS! Opening dashboard in browser...
 ```

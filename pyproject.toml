@@ -19,6 +19,7 @@ dependencies = [
     "kaleido>=1.2.0",
     "python-dateutil>=2.8.2",
     "keyring>=25.0.0",
+    "textual>=1.0.0",
 ]
 
 [project.scripts]
