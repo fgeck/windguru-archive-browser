@@ -8,6 +8,10 @@ on:
   release:
     types: [ published ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   setup:
     name: Setup and Cache Dependencies
@@ -120,6 +124,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
 
     steps:
     - name: Checkout code
@@ -135,12 +142,19 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Convert repository name to lowercase
+      id: repo
+      run: echo "repo_lower=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
     - name: Build and push Docker image (latest)
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}:latest
+        tags: ghcr.io/${{ steps.repo.outputs.repo_lower }}:latest
+        labels: |
+          org.opencontainers.image.source=${{ github.event.repository.html_url }}
+          org.opencontainers.image.description=Windguru Archive Browser
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -148,6 +162,9 @@ jobs:
     name: Tag and Push Docker Release
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
+    permissions:
+      contents: read
+      packages: write
 
     steps:
     - name: Checkout code
@@ -162,6 +179,10 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Convert repository name to lowercase
+      id: repo
+      run: echo "repo_lower=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
     - name: Extract version from tag
       id: version
@@ -173,7 +194,12 @@ jobs:
         context: .
         push: true
         tags: |
-          ghcr.io/${{ github.repository }}:${{ steps.version.outputs.VERSION }}
-          ghcr.io/${{ github.repository }}:latest
+          ghcr.io/${{ steps.repo.outputs.repo_lower }}:${{ steps.version.outputs.VERSION }}
+          ghcr.io/${{ steps.repo.outputs.repo_lower }}:latest
+        labels: |
+          org.opencontainers.image.source=${{ github.event.repository.html_url }}
+          org.opencontainers.image.description=Windguru Archive Browser
+          org.opencontainers.image.licenses=MIT
+          org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
         cache-from: type=gha
         cache-to: type=gha,mode=max

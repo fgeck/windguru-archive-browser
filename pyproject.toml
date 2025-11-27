@@ -2,7 +2,6 @@
 name = "windguru-archive-browser"
 version = "1.0.0"
 description = "A powerful command-line tool for fetching and visualizing historical wind data from Windguru"
-readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
