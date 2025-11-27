@@ -1,19 +1,18 @@
 """
 Tests for service classes.
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import date
+from unittest.mock import MagicMock, Mock, patch
+
 import pandas as pd
 
+from src.models.archive import ArchiveRequest, ArchiveResponse
+from src.models.auth import AuthCredentials
+from src.models.weather import DateRange, WeatherData
+from src.services.archive_service import ArchiveService
 from src.services.auth_service import AuthService
 from src.services.spot_service import SpotService
-from src.services.archive_service import ArchiveService
 from src.services.visualization_service import VisualizationService
-from src.models.auth import AuthCredentials, LoginResponse
-from src.models.spot import Spot, SpotSearchResult
-from src.models.weather import DateRange, WeatherData
-from src.models.archive import ArchiveRequest, ArchiveResponse
 
 
 class TestAuthService:

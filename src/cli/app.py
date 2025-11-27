@@ -3,22 +3,20 @@ Main CLI application.
 """
 import sys
 import webbrowser
-from pathlib import Path
-
 from typing import Optional
 
-from ..models.auth import AuthCredentials
-from ..models.archive import ArchiveRequest
-from ..models.spot import Spot
-from ..services.auth_service import AuthService
-from ..services.spot_service import SpotService
-from ..services.archive_service import ArchiveService
-from ..services.visualization_service import VisualizationService
-from ..services.credential_storage import CredentialStorage
 from ..config.settings import Settings
+from ..models.archive import ArchiveRequest
+from ..models.auth import AuthCredentials
+from ..models.spot import Spot
+from ..services.archive_service import ArchiveService
+from ..services.auth_service import AuthService
+from ..services.credential_storage import CredentialStorage
+from ..services.spot_service import SpotService
+from ..services.visualization_service import VisualizationService
 from ..utils.stats_utils import print_weather_stats
-from .prompts import CredentialsPrompt, SpotPrompt, DateRangePrompt, ModelPrompt
 from .formatter import CLIFormatter
+from .prompts import CredentialsPrompt, DateRangePrompt, ModelPrompt, SpotPrompt
 
 
 class WindguruCLI:
@@ -212,7 +210,7 @@ class WindguruCLI:
                 if open_browser == 'y':
                     webbrowser.open(f"file://{dashboard_file.absolute()}")
                     print(self.fmt.success("Opened in browser!"))
-            except:
+            except (KeyboardInterrupt, EOFError):
                 pass
 
             return True

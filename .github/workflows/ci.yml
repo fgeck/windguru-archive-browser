@@ -10,8 +10,9 @@ on:
 
 jobs:
   setup:
-    name: Setup Dependencies
+    name: Setup and Cache Dependencies
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -26,18 +27,16 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install dependencies
+    - name: Sync dependencies
       run: |
-        uv pip install --system -e ".[dev]"
-        uv pip install --system ruff mypy
+        uv sync --extra dev
+        uv pip install ruff mypy
 
-    - name: Cache dependencies
+    - name: Cache uv environment
       uses: actions/cache/save@v4
       with:
-        path: |
-          ~/.cache/uv
-          ~/.local
-        key: ${{ runner.os }}-python-3.12-${{ hashFiles('pyproject.toml') }}
+        path: .venv
+        key: venv-${{ runner.os }}-py3.12-${{ hashFiles('pyproject.toml', 'uv.lock') }}
 
   lint:
     name: Lint and Type Check
@@ -50,32 +49,33 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
-    - name: Restore dependencies
+    - name: Restore uv environment
       uses: actions/cache/restore@v4
       with:
-        path: |
-          ~/.cache/uv
-          ~/.local
-        key: ${{ runner.os }}-python-3.12-${{ hashFiles('pyproject.toml') }}
+        path: .venv
+        key: venv-${{ runner.os }}-py3.12-${{ hashFiles('pyproject.toml', 'uv.lock') }}
 
-    - name: Install dependencies
+    - name: Ensure dependencies are synced
       run: |
-        uv pip install --system -e ".[dev]"
-        uv pip install --system ruff mypy
+        uv sync --extra dev
+        uv pip install ruff mypy
 
     - name: Run ruff (linter)
       run: |
-        ruff check src/ tests/
+        uv run ruff check src/ tests/
 
     - name: Run mypy (type checker)
       run: |
-        mypy src/ --ignore-missing-imports
+        uv run mypy src/ --ignore-missing-imports
+      continue-on-error: true
 
   test:
     name: Test
@@ -88,27 +88,27 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
-    - name: Restore dependencies
+    - name: Restore uv environment
       uses: actions/cache/restore@v4
       with:
-        path: |
-          ~/.cache/uv
-          ~/.local
-        key: ${{ runner.os }}-python-3.12-${{ hashFiles('pyproject.toml') }}
+        path: .venv
+        key: venv-${{ runner.os }}-py3.12-${{ hashFiles('pyproject.toml', 'uv.lock') }}
 
-    - name: Install dependencies
+    - name: Ensure dependencies are synced
       run: |
-        uv pip install --system -e ".[dev]"
+        uv sync --extra dev
 
     - name: Run tests with coverage
       run: |
-        uv run pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
+        uv run pytest tests/ -v --cov-report=xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

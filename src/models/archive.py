@@ -2,7 +2,8 @@
 Archive request/response models.
 """
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
+
 from .weather import DateRange
 
 
@@ -12,7 +13,7 @@ class ArchiveRequest:
     spot_id: int
     model_id: int
     date_range: DateRange
-    variables: List[str]
+    variables: list[str]
     step_hours: int = 2
 
     @classmethod

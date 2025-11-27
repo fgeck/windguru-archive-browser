@@ -1,11 +1,12 @@
 """
 Statistics formatting and display utilities.
 """
-from typing import Dict, Any
+from typing import Any
+
 from ..models.weather import WeatherData
 
 
-def format_stats(stats: Dict[str, Any]) -> str:
+def format_stats(stats: dict[str, Any]) -> str:
     """
     Format statistics dictionary into readable string.
 

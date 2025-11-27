@@ -1,22 +1,22 @@
 """
 Archive data fetching and parsing service.
 """
-import requests
-from bs4 import BeautifulSoup
 import re
 from datetime import datetime
-import pandas as pd
 
-from ..models.auth import AuthCredentials
-from ..models.weather import WeatherData, DateRange
-from ..models.archive import ArchiveRequest, ArchiveResponse
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
 from ..config.constants import (
-    WINDGURU_BASE_URL,
-    WINDGURU_ARCHIVE_URL,
     DEFAULT_HEADERS,
-    DEFAULT_STEP_HOURS,
-    MIN_USE_HR
+    MIN_USE_HR,
+    WINDGURU_ARCHIVE_URL,
+    WINDGURU_BASE_URL,
 )
+from ..models.archive import ArchiveRequest, ArchiveResponse
+from ..models.auth import AuthCredentials
+from ..models.weather import WeatherData
 
 
 class ArchiveService:
@@ -130,7 +130,7 @@ class ArchiveService:
             date_str = cells[0].get_text(strip=True)
             try:
                 date = datetime.strptime(date_str, '%d.%m.%Y').date()
-            except:
+            except ValueError:
                 continue
 
             # Determine variable boundaries based on colspan

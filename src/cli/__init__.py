@@ -1,9 +1,9 @@
 """
 CLI interface for Windguru.
 """
-from .prompts import CredentialsPrompt, SpotPrompt, DateRangePrompt, ModelPrompt
-from .formatter import CLIFormatter
 from .app import WindguruCLI
+from .formatter import CLIFormatter
+from .prompts import CredentialsPrompt, DateRangePrompt, ModelPrompt, SpotPrompt
 
 __all__ = [
     'CredentialsPrompt',

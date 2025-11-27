@@ -1,24 +1,25 @@
 """
 Main Textual TUI application for Windguru Archive Browser.
 """
-from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical, ScrollableContainer
-from textual.widgets import Header, Footer, Button, Static, Input, Select, Label, Log, OptionList
-from textual.widgets.option_list import Option
-from textual.screen import Screen
-from typing import Optional
 import webbrowser
+from typing import Optional
 
+from textual.app import App, ComposeResult
+from textual.containers import Container, Horizontal
+from textual.screen import Screen
+from textual.widgets import Button, Footer, Header, Input, Label, Log, OptionList, Select
+from textual.widgets.option_list import Option
+
+from ..config.constants import WEATHER_MODELS
+from ..config.settings import Settings
 from ..models.auth import AuthCredentials
 from ..models.spot import Spot
-from ..models.weather import WeatherModel, DateRange
-from ..services.auth_service import AuthService
-from ..services.spot_service import SpotService
+from ..models.weather import WeatherModel
 from ..services.archive_service import ArchiveService
-from ..services.visualization_service import VisualizationService
+from ..services.auth_service import AuthService
 from ..services.credential_storage import CredentialStorage
-from ..config.settings import Settings
-from ..config.constants import WEATHER_MODELS
+from ..services.spot_service import SpotService
+from ..services.visualization_service import VisualizationService
 from ..utils.date_utils import parse_date_range_input
 from ..utils.stats_utils import format_stats
 
@@ -197,7 +198,7 @@ class SpotSearchScreen(Screen):
             count_label.update("Selected: None")
             self.query_one("#select_btn", Button).disabled = True
         elif count == 1:
-            count_label.update(f"Selected: 1 spot")
+            count_label.update("Selected: 1 spot")
             self.query_one("#select_btn", Button).disabled = False
         else:
             count_label.update(f"Selected: {count} spots")
@@ -369,7 +370,7 @@ class DataFetchScreen(Screen):
             model_name = model.name if model else f"Model {model_id}"
 
             # Fetch data
-            log.write_line(f"📥 Fetching data from Windguru...")
+            log.write_line("📥 Fetching data from Windguru...")
             log.write_line(f"   Spot: {self.spot.name}")
             log.write_line(f"   Model: {model_name}")
             log.write_line(f"   Dates: {date_range}\n")

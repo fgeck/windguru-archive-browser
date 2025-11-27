@@ -1,13 +1,14 @@
 """
 Spot search service for Windguru API.
 """
-import requests
 import json
-from typing import List, Optional
+from typing import Optional
 
-from ..models.spot import Spot, SpotSearchResult
+import requests
+
+from ..config.constants import DEFAULT_HEADERS, WINDGURU_API_URL
 from ..models.auth import AuthCredentials
-from ..config.constants import WINDGURU_API_URL, DEFAULT_HEADERS
+from ..models.spot import Spot, SpotSearchResult
 
 
 class SpotService:
@@ -89,7 +90,7 @@ class SpotService:
                 total=len(spots)
             )
 
-        except Exception as e:
+        except Exception:
             return SpotSearchResult(spots=[], query=query, total=0)
 
     def get_spot_by_id(self, spot_id: int) -> Optional[Spot]:

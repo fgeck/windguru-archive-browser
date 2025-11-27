@@ -1,8 +1,7 @@
 """
 Tests for credential validation logic.
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 from src.cli.app import WindguruCLI
 from src.models.auth import AuthCredentials

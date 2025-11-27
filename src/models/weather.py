@@ -2,8 +2,9 @@
 Weather-related data models.
 """
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
+
 import pandas as pd
 
 

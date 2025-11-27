@@ -1,0 +1,6 @@
+# Project-specific rules for Claude Code
+
+## Code Quality
+- Always run `uv run ruff check --fix --unsafe-fixes` on modified Python files before considering a task complete
+- Ensure all ruff linting rules pass - no bare except clauses, use modern type annotations (dict/list/tuple instead of Dict/List/Tuple)
+- Fix all linting errors, don't use continue-on-error for linting in CI/CD

@@ -2,7 +2,7 @@
 Spot-related data models.
 """
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 
 @dataclass
@@ -25,7 +25,7 @@ class Spot:
 @dataclass
 class SpotSearchResult:
     """Result from spot search."""
-    spots: List[Spot]
+    spots: list[Spot]
     query: str
     total: int
 

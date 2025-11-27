@@ -1,14 +1,15 @@
 """
 Visualization service for creating charts and graphs.
 """
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
-from ..models.weather import WeatherData
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 from ..config.constants import WIND_SPEED_ZONES
+from ..models.weather import WeatherData
 
 
 class VisualizationService:
@@ -58,7 +59,7 @@ class VisualizationService:
                     y=df['wind_speed'],
                     mode='lines',
                     name='Wind Speed',
-                    line=dict(color='#1f77b4', width=2),
+                    line={"color": '#1f77b4', "width": 2},
                     fill='tozeroy',
                     fillcolor='rgba(31, 119, 180, 0.3)',
                     hovertemplate='<b>%{x}</b><br>Wind Speed: %{y:.1f} knots<extra></extra>'
@@ -85,7 +86,7 @@ class VisualizationService:
 
                 for _, row in df_arrows.iterrows():
                     # Convert wind direction to arrow angle (wind direction is "from", need to show "to")
-                    angle_rad = (row['wind_dir'] + 180) % 360 * 3.14159 / 180
+                    (row['wind_dir'] + 180) % 360 * 3.14159 / 180
                     arrow_length = row['wind_speed'] * 0.3  # Scale arrow by wind speed
 
                     fig.add_annotation(
@@ -114,7 +115,7 @@ class VisualizationService:
                     y=df['temperature'],
                     mode='lines',
                     name='Temperature',
-                    line=dict(color='#d62728', width=2),
+                    line={"color": '#d62728', "width": 2},
                     fill='tozeroy',
                     fillcolor='rgba(214, 39, 40, 0.3)',
                     hovertemplate='<b>%{x}</b><br>Temperature: %{y:.1f}°C<extra></extra>'

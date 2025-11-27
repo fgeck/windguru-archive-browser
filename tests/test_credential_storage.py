@@ -1,11 +1,10 @@
 """
 Tests for credential storage service.
 """
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-from src.services.credential_storage import CredentialStorage
 from src.models.auth import AuthCredentials
+from src.services.credential_storage import CredentialStorage
 
 
 class TestCredentialStorage:

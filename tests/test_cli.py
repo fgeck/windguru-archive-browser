@@ -1,12 +1,10 @@
 """
 Tests for CLI components.
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from io import StringIO
+from unittest.mock import MagicMock, Mock, patch
 
-from src.cli.formatter import CLIFormatter
 from src.cli.app import WindguruCLI
+from src.cli.formatter import CLIFormatter
 from src.config.settings import Settings
 from src.models.auth import AuthCredentials
 

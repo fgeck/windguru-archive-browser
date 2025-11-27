@@ -1,18 +1,15 @@
 """
 Tests for utility functions.
 """
-import pytest
-from datetime import date, datetime
-import pandas as pd
+from datetime import date
 
-from src.utils.date_utils import (
-    parse_date_input,
-    get_last_day_of_month,
-    parse_date_range_input
-)
-from src.utils.file_utils import generate_safe_filename, ensure_dir
+import pandas as pd
+import pytest
+
+from src.models.weather import DateRange, WeatherData
+from src.utils.date_utils import get_last_day_of_month, parse_date_input, parse_date_range_input
+from src.utils.file_utils import ensure_dir, generate_safe_filename
 from src.utils.stats_utils import format_stats, print_weather_stats
-from src.models.weather import WeatherData, DateRange
 
 
 class TestDateUtils:

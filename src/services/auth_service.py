@@ -1,11 +1,11 @@
 """
 Authentication service for Windguru API.
 """
-import requests
-from typing import Optional
 
+import requests
+
+from ..config.constants import DEFAULT_HEADERS, WINDGURU_API_URL, WINDGURU_BASE_URL
 from ..models.auth import AuthCredentials, LoginResponse
-from ..config.constants import WINDGURU_BASE_URL, WINDGURU_API_URL, DEFAULT_HEADERS
 
 
 class AuthService:
@@ -110,7 +110,7 @@ class AuthService:
                 cookies=credentials.to_cookies()
             )
             return response.status_code == 200
-        except:
+        except Exception:
             return False
 
     def validate_credentials(self, credentials: AuthCredentials) -> bool:

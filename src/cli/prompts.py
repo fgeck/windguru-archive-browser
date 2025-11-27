@@ -2,14 +2,14 @@
 CLI prompt handlers.
 """
 import getpass
-from typing import Optional, Tuple
+from typing import Optional
 
+from ..config.constants import WEATHER_MODELS
 from ..models.auth import AuthCredentials
 from ..models.spot import Spot
 from ..models.weather import DateRange, WeatherModel
-from ..utils.date_utils import parse_date_range_input
-from ..config.constants import WEATHER_MODELS
 from ..services.credential_storage import CredentialStorage
+from ..utils.date_utils import parse_date_range_input
 from .formatter import CLIFormatter
 
 
@@ -17,7 +17,7 @@ class CredentialsPrompt:
     """Handles credential input from user."""
 
     @staticmethod
-    def prompt() -> Tuple[Optional[str], Optional[str], Optional[AuthCredentials], str]:
+    def prompt() -> tuple[Optional[str], Optional[str], Optional[AuthCredentials], str]:
         """
         Prompt user for credentials.
 
@@ -165,7 +165,7 @@ class SpotPrompt:
         for i, spot in enumerate(spots, 1):
             print(f"  {i}. {spot}")
 
-        print(f"\n  0. Search again")
+        print("\n  0. Search again")
 
         while True:
             try:

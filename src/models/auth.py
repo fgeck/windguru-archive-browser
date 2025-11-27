@@ -2,7 +2,7 @@
 Authentication-related data models.
 """
 from dataclasses import dataclass
-from typing import Optional, Dict
+from typing import Optional
 
 
 @dataclass
@@ -14,7 +14,7 @@ class AuthCredentials:
     deviceid: Optional[str] = None
     langc: str = 'en-'
 
-    def to_cookies(self) -> Dict[str, str]:
+    def to_cookies(self) -> dict[str, str]:
         """Convert credentials to cookies dictionary."""
         cookies = {
             'idu': self.idu,
@@ -28,7 +28,7 @@ class AuthCredentials:
         return cookies
 
     @classmethod
-    def from_cookies(cls, cookies: Dict[str, str]) -> 'AuthCredentials':
+    def from_cookies(cls, cookies: dict[str, str]) -> 'AuthCredentials':
         """Create credentials from cookies dictionary."""
         return cls(
             idu=cookies.get('idu', ''),

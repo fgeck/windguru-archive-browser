@@ -1,8 +1,10 @@
 """
 Secure credential storage service using system keyring.
 """
-import keyring
 from typing import Optional
+
+import keyring
+
 from ..models.auth import AuthCredentials
 
 

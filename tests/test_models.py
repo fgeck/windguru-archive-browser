@@ -1,14 +1,15 @@
 """
 Tests for data models.
 """
-import pytest
 from datetime import date
-import pandas as pd
 
+import pandas as pd
+import pytest
+
+from src.models.archive import ArchiveRequest, ArchiveResponse
 from src.models.auth import AuthCredentials, LoginResponse
 from src.models.spot import Spot, SpotSearchResult
-from src.models.weather import WeatherModel, DateRange, WeatherData
-from src.models.archive import ArchiveRequest, ArchiveResponse
+from src.models.weather import DateRange, WeatherData, WeatherModel
 
 
 class TestAuthCredentials:
