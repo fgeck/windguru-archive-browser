@@ -56,6 +56,10 @@ class WindguruCLI:
 
         if method in ('auto', 'auto-save'):
             # Auto-login
+            if not email or not password:
+                print(self.fmt.error("Email and password are required for auto-login"))
+                return False
+
             self.auth_service = AuthService()
             print(f"\n{self.fmt.working('Connecting to Windguru...')}")
 
@@ -69,6 +73,7 @@ class WindguruCLI:
                 return False
 
             self.credentials = response.credentials
+            assert self.credentials is not None
             print(self.fmt.success("Successfully logged in!"))
             print(f"   IDU: {self.credentials.idu}")
             print(f"   login_md5: {self.credentials.login_md5[:20]}...")
@@ -80,6 +85,10 @@ class WindguruCLI:
 
         elif method in ('manual', 'manual-save'):
             # Manual login - validate credentials first
+            if not manual_creds:
+                print(self.fmt.error("Manual credentials are required"))
+                return False
+
             self.credentials = manual_creds
             self.auth_service = AuthService()
 
@@ -98,6 +107,10 @@ class WindguruCLI:
 
         elif method == 'cached':
             # Use cached credentials - need to validate they're still valid
+            if not manual_creds:
+                print(self.fmt.error("No cached credentials found"))
+                return False
+
             self.credentials = manual_creds
             self.auth_service = AuthService()
             print(self.fmt.success("Using saved credentials!"))
@@ -113,12 +126,21 @@ class WindguruCLI:
 
             print(self.fmt.success("Credentials are valid!"))
 
+        # At this point credentials must be set
+        if not self.credentials:
+            print(self.fmt.error("Failed to obtain credentials"))
+            return False
+
         # Initialize services
         self.spot_service = SpotService(self.credentials)
         self.archive_service = ArchiveService(self.credentials)
         self.viz_service = VisualizationService(self.settings.output_dir)
 
         # Establish session
+        if not self.auth_service:
+            print(self.fmt.error("Auth service not initialized"))
+            return False
+
         print(f"\n{self.fmt.working('Establishing session with Windguru...')}")
         if not self.auth_service.establish_session(self.credentials):
             print(self.fmt.error("Failed to establish session"))
@@ -141,6 +163,9 @@ class WindguruCLI:
                 continue
 
             print(f"\n{self.fmt.working(f'Searching for {query!r}...')}")
+            if not self.spot_service:
+                print(self.fmt.error("Spot service not initialized"))
+                return None
             results = self.spot_service.search(query)
 
             if not results.spots:
@@ -181,6 +206,10 @@ class WindguruCLI:
                 include_temp=True
             )
 
+            if not self.archive_service:
+                print(self.fmt.error("Archive service not initialized"))
+                return False
+
             weather_data = self.archive_service.get_weather_data(
                 request,
                 spot_name=spot.name,
@@ -195,6 +224,10 @@ class WindguruCLI:
             # Create visualization
             print(self.fmt.header("CREATING VISUALIZATION"))
             print()
+
+            if not self.viz_service:
+                print(self.fmt.error("Visualization service not initialized"))
+                return False
 
             print("📊 Creating interactive dashboard...")
             dashboard_file = self.viz_service.create_dashboard(weather_data)

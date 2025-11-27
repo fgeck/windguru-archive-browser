@@ -231,7 +231,15 @@ class ModelPrompt:
         print(fmt.header("WEATHER MODEL"))
         print("Choose a weather model:\n")
 
-        models = [WeatherModel(**m) for m in WEATHER_MODELS]
+        models = [
+            WeatherModel(
+                id=m['id'],  # type: ignore[arg-type]
+                name=m['name'],  # type: ignore[arg-type]
+                resolution=m.get('resolution'),  # type: ignore[arg-type]
+                coverage=m.get('coverage')  # type: ignore[arg-type]
+            )
+            for m in WEATHER_MODELS
+        ]
 
         for i, model in enumerate(models, 1):
             print(f"  {i}. {model.name}")

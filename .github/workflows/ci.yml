@@ -75,7 +75,6 @@ jobs:
     - name: Run mypy (type checker)
       run: |
         uv run mypy src/ --ignore-missing-imports
-      continue-on-error: true
 
   test:
     name: Test

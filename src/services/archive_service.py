@@ -3,6 +3,7 @@ Archive data fetching and parsing service.
 """
 import re
 from datetime import datetime
+from typing import Optional
 
 import pandas as pd
 import requests
@@ -114,8 +115,9 @@ class ArchiveService:
         header_row = table.find_all('tr')[0]
         variable_headers = []
         for td in header_row.find_all('td'):
-            if td.get('colspan'):
-                colspan = int(td.get('colspan'))
+            colspan_attr = td.get('colspan')
+            if colspan_attr:
+                colspan = int(str(colspan_attr))
                 text = td.get_text(strip=True)
                 variable_headers.append((text, colspan))
 
@@ -152,8 +154,9 @@ class ArchiveService:
                         svg = cell.find('svg')
                         if svg:
                             g = svg.find('g')
-                            if g and g.get('transform'):
-                                match = re.search(r'rotate\((\d+)', g.get('transform'))
+                            transform_attr = g.get('transform') if g else None
+                            if transform_attr:
+                                match = re.search(r'rotate\((\d+)', str(transform_attr))
                                 if match:
                                     wind_dir = int(match.group(1)) % 360
                                     row_data['wind_dir'] = wind_dir
@@ -188,8 +191,8 @@ class ArchiveService:
         return df
 
     def get_weather_data(self, request: ArchiveRequest,
-                         spot_name: str = None,
-                         model_name: str = None) -> WeatherData:
+                         spot_name: Optional[str] = None,
+                         model_name: Optional[str] = None) -> WeatherData:
         """
         Fetch and parse weather data in one call.
 

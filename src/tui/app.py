@@ -322,7 +322,7 @@ class DataFetchScreen(Screen):
             yield Label(f"📊 Fetch Data for: {self.spot.name}", classes="title")
 
             yield Label("Weather Model:")
-            model_options = [(m['name'], str(m['id'])) for m in WEATHER_MODELS]
+            model_options = [(str(m['name']), str(m['id'])) for m in WEATHER_MODELS]  # type: ignore[typeddict-item]
             yield Select(model_options, id="model_select", value="3")
 
             yield Label("Date Range:")
@@ -351,7 +351,13 @@ class DataFetchScreen(Screen):
         log.clear()
 
         # Get inputs
-        model_id = int(self.query_one("#model_select", Select).value)
+        model_value = self.query_one("#model_select", Select).value
+        if isinstance(model_value, str):
+            model_id = int(model_value)
+        else:
+            self.app.notify("Invalid model selection", severity="error")
+            return
+
         date_from = self.query_one("#date_from", Input).value
         date_to = self.query_one("#date_to", Input).value
 
@@ -366,7 +372,18 @@ class DataFetchScreen(Screen):
             log.write_line(f"✅ Date range: {date_range}\n")
 
             # Find model name
-            model = next((WeatherModel(**m) for m in WEATHER_MODELS if m['id'] == model_id), None)
+            model = next(
+                (
+                    WeatherModel(
+                        id=m['id'],  # type: ignore[arg-type]
+                        name=m['name'],  # type: ignore[arg-type]
+                        resolution=m.get('resolution'),  # type: ignore[arg-type]
+                        coverage=m.get('coverage')  # type: ignore[arg-type]
+                    )
+                    for m in WEATHER_MODELS if m['id'] == model_id  # type: ignore[typeddict-item]
+                ),
+                None
+            )
             model_name = model.name if model else f"Model {model_id}"
 
             # Fetch data
@@ -496,9 +513,9 @@ class WindguruTUI(App):
     def run_login(self) -> None:
         """Run login flow."""
         has_saved = CredentialStorage.has_saved_credentials()
-        self.push_screen(LoginScreen(has_saved), self.handle_login)
+        self.push_screen(LoginScreen(has_saved), self.handle_login)  # type: ignore[arg-type]
 
-    def handle_login(self, result: tuple) -> None:
+    def handle_login(self, result: Optional[tuple[str, Optional[str], Optional[str]]]) -> None:
         """Handle login result."""
         if result is None:
             self.exit()
@@ -531,6 +548,11 @@ class WindguruTUI(App):
 
         elif method == "auto":
             # Auto-login
+            if not email or not password:
+                self.notify("Email and password required for auto-login", severity="error")
+                self.run_login()
+                return
+
             self.auth_service = AuthService()
             self.notify("Connecting to Windguru...", severity="information")
 
@@ -542,6 +564,7 @@ class WindguruTUI(App):
                 return
 
             self.credentials = response.credentials
+            assert self.credentials is not None
             self.notify("Successfully logged in!", severity="information")
 
             # Save credentials
@@ -553,12 +576,20 @@ class WindguruTUI(App):
 
     def initialize_services(self) -> None:
         """Initialize all services."""
+        if not self.credentials:
+            self.notify("No credentials available", severity="error")
+            return
+
         self.spot_service = SpotService(self.credentials)
         self.archive_service = ArchiveService(self.credentials)
         self.viz_service = VisualizationService(self.settings.output_dir)
 
     def run_spot_search(self) -> None:
         """Run spot search flow."""
+        if not self.spot_service:
+            self.notify("Spot service not initialized", severity="error")
+            return
+
         self.push_screen(SpotSearchScreen(self.spot_service), self.handle_spot_selection)
 
     def handle_spot_selection(self, spot: Optional[Spot]) -> None:
@@ -568,9 +599,14 @@ class WindguruTUI(App):
             return
 
         self.notify(f"Selected: {spot.name}", severity="information")
+
+        if not self.archive_service or not self.viz_service:
+            self.notify("Services not initialized", severity="error")
+            return
+
         self.push_screen(
             DataFetchScreen(spot, self.archive_service, self.viz_service),
-            self.handle_data_fetch
+            self.handle_data_fetch  # type: ignore[arg-type]
         )
 
     def handle_data_fetch(self, success: bool) -> None:
